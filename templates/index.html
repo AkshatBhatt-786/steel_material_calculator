@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raviraj Industries - Steel Material Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 15px;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .company-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #ffd700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .company-tagline {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+            color: #f0f0f0;
+        }
+
+        .company-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .calculator {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .progress-container {
+            background: #0f2027;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #2c5364;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 20%;
+            background: linear-gradient(90deg, #ffd700, #ff9800);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            color: #aaa;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .step.active {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .step-panel {
+            display: none;
+            padding: 25px;
+        }
+
+        .step-panel.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .step-title {
+            font-size: 2rem;
+            color: #1a2a6c;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .step-subtitle {
+            font-size: 1.3rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 180px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border-color: #1a2a6c;
+        }
+
+        .option-card.selected {
+            border-color: #1a2a6c;
+            background: #e6f0ff;
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px rgba(26, 42, 108, 0.3);
+        }
+
+        .option-card h3 {
+            color: #1a2a6c;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+        }
+
+        .option-card p {
+            color: #555;
+            font-size: 1.2rem;
+        }
+
+        .color-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-option:after {
+            content: attr(title);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 1rem;
+            color: #333;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .color-option:hover:after {
+            opacity: 1;
+        }
+
+        .color-option.selected {
+            border-color: #1a2a6c;
+            transform: scale(1.15);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .input-row label {
+            width: 250px;
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: #1a2a6c;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 18px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-row input:focus {
+            border-color: #1a2a6c;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 18px 35px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-prev {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-prev:hover {
+            background: #5a6268;
+            transform: translateY(-3px);
+        }
+
+        .btn-next {
+            background: #1a2a6c;
+            color: white;
+        }
+
+        .btn-next:hover {
+            background: #0d1a4c;
+            transform: translateY(-3px);
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            width: 100%;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-calculate:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-container {
+            padding: 25px;
+        }
+
+        .result-summary {
+            background: linear-gradient(135deg, #e6f0ff, #cfe2ff);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 3px solid #1a2a6c;
+        }
+
+        .result-summary h3 {
+            font-size: 1.8rem;
+            color: #1a2a6c;
+            margin-bottom: 15px;
+        }
+
+        .result-price {
+            font-size: 3.5rem;
+            color: #1a2a6c;
+            font-weight: 800;
+            margin: 20px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .result-summary p {
+            font-size: 1.3rem;
+            color: #555;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .detail-label {
+            font-weight: 700;
+            color: #1a2a6c;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-label i {
+            font-size: 1.6rem;
+        }
+
+        .detail-value {
+            font-size: 1.4rem;
+            color: #333;
+            font-weight: 600;
+            line-height: 1.8;
+        }
+
+        .help-note {
+            background: #fff8e1;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.2rem;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                font-size: 16px;
+            }
+            
+            .company-name {
+                font-size: 2rem;
+            }
+            
+            .company-tagline {
+                font-size: 1.1rem;
+            }
+            
+            .info-item {
+                font-size: 1rem;
+                padding: 8px 15px;
+            }
+            
+            .step-title {
+                font-size: 1.8rem;
+            }
+            
+            .step-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .option-card {
+                padding: 20px;
+                min-height: auto;
+            }
+            
+            .option-card h3 {
+                font-size: 1.4rem;
+            }
+            
+            .input-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            .input-row label {
+                width: 100%;
+                font-size: 1.2rem;
+            }
+            
+            .input-row input {
+                width: 100%;
+                padding: 15px;
+                font-size: 1.2rem;
+            }
+            
+            .color-options {
+                gap: 15px;
+            }
+            
+            .color-option {
+                width: 50px;
+                height: 50px;
+            }
+            
+            button {
+                padding: 15px 25px;
+                font-size: 1.1rem;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .result-price {
+                font-size: 2.5rem;
+            }
+            
+            .detail-card {
+                padding: 20px;
+            }
+            
+            .detail-label {
+                font-size: 1.2rem;
+            }
+            
+            .detail-value {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .company-name {
+                font-size: 1.7rem;
+            }
+            
+            .step-title {
+                font-size: 1.5rem;
+            }
+            
+            .color-option {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .result-price {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="company-name">Raviraj Industries</div>
+            <div class="company-tagline">Steel Material Calculator</div>
+            <div class="company-info">
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+91 9876543210</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>info@ravirajindustries.com</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Mumbai, India</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="calculator">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">Product</div>
+                    <div class="step" data-step="2">Thickness</div>
+                    <div class="step" data-step="3">Color</div>
+                    <div class="step" data-step="4">Dimensions</div>
+                    <div class="step" data-step="5">Result</div>
+                </div>
+            </div>
+            
+            <!-- Step 1: Company & Type -->
+            <div id="step1" class="step-panel active">
+                <div class="step-header">
+                    <h2 class="step-title">Select Steel Product</h2>
+                    <p class="step-subtitle">Choose your preferred manufacturer and product type</p>
+                </div>
+                
+                <div class="options-grid">
+                    <div class="option-card selected" data-company="JSW" data-type="COLOURON+">
+                        <h3>JSW - COLOURON+</h3>
+                        <p>Premium quality with enhanced durability</p>
+                    </div>
+                    <div class="option-card" data-company="JSW" data-type="Pragati">
+                        <h3>JSW - Pragati</h3>
+                        <p>Cost-effective solution for standard applications</p>
+                    </div>
+                    <div class="option-card" data-company="AMNS" data-type="Standard">
+                        <h3>AMNS - Standard</h3>
+                        <p>Reliable performance at competitive pricing</p>
+                    </div>
+                </div>
+                
+                <div class="help-note">
+                    <i class="fas fa-info-circle"></i> Tip: Tap on a product card to select it. The border will turn blue when selected.
+                </div>
+                
+                <div class="btn-group">
+                    <div></div>
+                    <button class="btn-next" onclick="showStep(2)">
+                        Next Step <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Thickness -->
+            <div id="step2" class="step-panel">
+                <div class="step-header">
+                    <h2 class="step-title">Select Material Thickness</h2>
+                    <p class="step-subtitle">Choose the gauge thickness for your material</p>
+                </div>
+                
+                <div class="options-grid">
+                    <div class="option-card selected" data-thickness="0.5">
+                        <h3>0.5 mm Thickness</h3>
+                        <p>Standard thickness for most applications</p>
+                    </div>
+                    <div class="option-card" data-thickness="0.6">
+                        <h3>0.6 mm Thickness</h3>
+                        <p>Heavier gauge for enhanced strength</p>
+                    </div>
+                </div>
+                
+                <div class="help-note">
+                    <i class="fas fa-info-circle"></i> Thicker materials provide more strength but cost more per square foot.
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn-prev" onclick="showStep(1)">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn-next" onclick="showStep(3)">
+                        Next Step <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Color -->
+            <div id="step3" class="step-panel">
+                <div class="step-header">
+                    <h2 class="step-title">Select Color Finish</h2>
+                    <p class="step-subtitle">Choose your preferred color for the steel material</p>
+                </div>
+                
+                <div class="options-grid">
+                    <div class="option-card">
+                        <h3>Color Options</h3>
+                        <p>Select a color from our standard options</p>
+                        
+                        <div class="color-options">
+                            <div class="color-option selected" style="background: white;" title="White"></div>
+                            <div class="color-option" style="background: #1e3a8a;" title="Blue"></div>
+                            <div class="color-option" style="background: #1c1917;" title="Black"></div>
+                            <div class="color-option" style="background: #6b7280;" title="Grey"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="help-note">
+                    <i class="fas fa-info-circle"></i> Hover over colors to see their names. Some colors have a small additional cost.
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn-prev" onclick="showStep(2)">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn-next" onclick="showStep(4)">
+                        Next Step <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 4: Dimensions -->
+            <div id="step4" class="step-panel">
+                <div class="step-header">
+                    <h2 class="step-title">Enter Dimensions</h2>
+                    <p class="step-subtitle">Specify your material requirements</p>
+                </div>
+                
+                <div class="input-group">
+                    <div class="input-row">
+                        <label for="length"><i class="fas fa-ruler"></i> Length (ft):</label>
+                        <input type="number" id="length" min="1" value="100">
+                    </div>
+                    <div class="input-row">
+                        <label for="pieces"><i class="fas fa-cubes"></i> Number of Pieces:</label>
+                        <input type="number" id="pieces" min="1" value="10">
+                    </div>
+                    <div class="input-row">
+                        <label for="width"><i class="fas fa-arrows-alt-h"></i> Width (ft):</label>
+                        <input type="number" id="width" min="1" step="0.1" value="3">
+                    </div>
+                </div>
+                
+                <div class="help-note">
+                    <i class="fas fa-info-circle"></i> Enter the dimensions of each piece. Total area will be calculated automatically.
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn-prev" onclick="showStep(3)">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn-calculate" id="calcBtn" onclick="calculatePrice()">
+                        <i class="fas fa-calculator"></i> Calculate Total Price
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Results -->
+            <div id="step5" class="step-panel">
+                <div class="step-header">
+                    <h2 class="step-title">Your Calculation Results</h2>
+                    <p class="step-subtitle">Review your material cost estimation</p>
+                </div>
+                
+                <div class="result-container">
+                    <div class="result-summary">
+                        <h3>Total Estimated Price</h3>
+                        <div class="result-price">₹ 0</div>
+                        <p>All prices include GST and delivery charges</p>
+                    </div>
+                    
+                    <div class="result-details">
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <i class="fas fa-industry"></i> Material
+                            </div>
+                            <div class="detail-value">-</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <i class="fas fa-ruler-combined"></i> Thickness
+                            </div>
+                            <div class="detail-value">-</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <i class="fas fa-palette"></i> Color
+                            </div>
+                            <div class="detail-value">-</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <i class="fas fa-cube"></i> Dimensions
+                            </div>
+                            <div class="detail-value">-</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <i class="fas fa-calculator"></i> Total Area
+                            </div>
+                            <div class="detail-value">-</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <i class="fas fa-tag"></i> Price per sq.ft
+                            </div>
+                            <div class="detail-value">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn-prev" onclick="showStep(4)">
+                        <i class="fas fa-edit"></i> Modify
+                    </button>
+                    <button class="btn-next" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> New Calculation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const selection = {
+            company: "JSW",
+            type: "COLOURON+",
+            thickness: "0.5",
+            color: "White",
+            length: 100,
+            pieces: 10,
+            width: 3
+        };
+
+        const pricing = {
+            "JSW": {
+                "COLOURON+": { "0.5": 140, "0.6": 140 },
+                "Pragati": { "0.5": 130, "0.6": 130 }
+            },
+            "AMNS": {
+                "Standard": { "0.5": 120, "0.6": 120 }
+            },
+            "colorPremium": {
+                "White": 0, "Blue": 0, "Black": 0, "Grey": 0
+            }
+        };
+
+        function updateProgress() {
+            const progress = (currentStep / 5) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index + 1 <= currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+
+        function showStep(step) {
+            // Validate inputs when leaving step 4
+            if (currentStep === 4 && step === 5) {
+                const length = parseFloat(document.getElementById('length').value);
+                const pieces = parseFloat(document.getElementById('pieces').value);
+                const width = parseFloat(document.getElementById('width').value);
+                
+                if (!length || length <= 0) {
+                    alert("Please enter a valid length");
+                    return;
+                }
+                if (!pieces || pieces <= 0) {
+                    alert("Please enter a valid number of pieces");
+                    return;
+                }
+                if (!width || width <= 0) {
+                    alert("Please enter a valid width");
+                    return;
+                }
+            }
+
+            document.querySelector(`#step${currentStep}`).classList.remove('active');
+            currentStep = step;
+            document.querySelector(`#step${currentStep}`).classList.add('active');
+            
+            updateProgress();
+            
+            if (step === 5) updateResults();
+        }
+
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const parent = this.closest('.step-panel');
+                if (parent) {
+                    parent.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    if (currentStep === 1) {
+                        selection.company = this.dataset.company;
+                        selection.type = this.dataset.type;
+                    } else if (currentStep === 2) {
+                        selection.thickness = this.dataset.thickness;
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const parent = this.closest('.options-grid');
+                if (parent) {
+                    parent.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selection.color = this.title;
+                }
+            });
+        });
+
+        function calculatePrice() {
+            const calcBtn = document.getElementById('calcBtn');
+            calcBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+            calcBtn.disabled = true;
+
+            // Get dimension values
+            selection.length = parseFloat(document.getElementById('length').value) || 100;
+            selection.pieces = parseFloat(document.getElementById('pieces').value) || 10;
+            selection.width = parseFloat(document.getElementById('width').value) || 3;
+
+            // Simulate API call with timeout
+            setTimeout(() => {
+                showStep(5);
+                calcBtn.innerHTML = '<i class="fas fa-calculator"></i> Calculate Total Price';
+                calcBtn.disabled = false;
+            }, 800);
+        }
+
+        function updateResults() {
+            const totalArea = selection.length * selection.width * selection.pieces;
+            const basePrice = pricing[selection.company][selection.type][selection.thickness];
+            const colorPrice = pricing.colorPremium[selection.color];
+            const finalPrice = basePrice + colorPrice;
+            const total = totalArea * finalPrice;
+
+            document.querySelector('.result-price').textContent = `₹ ${total.toLocaleString('en-IN')}`;
+            document.querySelectorAll('.detail-card .detail-value')[0].textContent = `${selection.company} - ${selection.type}`;
+            document.querySelectorAll('.detail-card .detail-value')[1].textContent = `${selection.thickness} mm`;
+            document.querySelectorAll('.detail-card .detail-value')[2].textContent = selection.color;
+            document.querySelectorAll('.detail-card .detail-value')[3].textContent = 
+                `${selection.length} ft length, ${selection.pieces} pieces (${selection.width} ft width)`;
+            document.querySelectorAll('.detail-card .detail-value')[4].textContent = 
+                `${totalArea.toLocaleString('en-IN')} sq.ft`;
+            document.querySelectorAll('.detail-card .detail-value')[5].textContent = 
+                `₹ ${finalPrice} (Base : ₹${basePrice})`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize selections
+            document.querySelector('#step1 .option-card').click();
+            document.querySelector('#step2 .option-card').click();
+            document.querySelector('#step3 .color-option').click();
+            updateProgress();
+            
+            // Add touch feedback for mobile
+            document.querySelectorAll('.option-card, .color-option, button').forEach(el => {
+                el.addEventListener('touchstart', function() {
+                    this.classList.add('touch-active');
+                });
+                
+                el.addEventListener('touchend', function() {
+                    this.classList.remove('touch-active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
